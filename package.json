@@ -1,0 +1,22 @@
+{
+  "name": "social-app",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "concurrently \"tsc --watch\" \"node --watch .\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongoose": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.3.1",
+    "concurrently": "^9.2.1"
+  }
+}
