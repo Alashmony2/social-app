@@ -5,7 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bootstrap = bootstrap;
 const auth_controller_1 = __importDefault(require("./modules/auth/auth.controller"));
+const connection_1 = require("./DB/connection");
 function bootstrap(app, express) {
+    (0, connection_1.connectDB)();
     //parsing body => row json
     app.use(express.json());
     //auth
