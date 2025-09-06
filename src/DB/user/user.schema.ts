@@ -48,7 +48,7 @@ export const userSchema = new Schema<IUser>(
     otp: { type: String },
     otpExpiry: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 userSchema
