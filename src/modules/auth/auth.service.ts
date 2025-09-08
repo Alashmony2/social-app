@@ -9,9 +9,9 @@ import { AuthFactoryService } from "./factory";
 
 class AuthService {
   private userRepository = new UserRepository();
-  private authFactoryService = new AuthFactoryService
+  private authFactoryService = new AuthFactoryService();
   constructor() {}
-  async register(req: Request, res: Response, next: NextFunction) {
+  register = async (req: Request, res: Response, next: NextFunction) => {
     //get data form request
     const registerDto: RegisterDTO = req.body;
     //check user exist
@@ -22,15 +22,15 @@ class AuthService {
       throw new ConflictException("User already exist");
     }
     //prepare data
-    const user = this.authFactoryService.register(registerDto)
+    const user = this.authFactoryService.register(registerDto);
     //save into DB
-    const createdUser =  this.userRepository.create(user);
+    const createdUser = await this.userRepository.create(user);
     //send response
     return res.status(201).json({
       message: "User Created Successfully",
       success: true,
       data: createdUser,
     });
-  }
+  };
 }
 export default new AuthService();

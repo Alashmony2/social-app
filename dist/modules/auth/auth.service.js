@@ -5,9 +5,9 @@ const user_repository_1 = require("../../DB/user/user.repository");
 const factory_1 = require("./factory");
 class AuthService {
     userRepository = new user_repository_1.UserRepository();
-    authFactoryService = new factory_1.AuthFactoryService;
+    authFactoryService = new factory_1.AuthFactoryService();
     constructor() { }
-    async register(req, res, next) {
+    register = async (req, res, next) => {
         //get data form request
         const registerDto = req.body;
         //check user exist
@@ -20,13 +20,13 @@ class AuthService {
         //prepare data
         const user = this.authFactoryService.register(registerDto);
         //save into DB
-        const createdUser = this.userRepository.create(user);
+        const createdUser = await this.userRepository.create(user);
         //send response
         return res.status(201).json({
             message: "User Created Successfully",
             success: true,
             data: createdUser,
         });
-    }
+    };
 }
 exports.default = new AuthService();

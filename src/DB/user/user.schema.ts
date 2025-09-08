@@ -46,7 +46,7 @@ export const userSchema = new Schema<IUser>(
       default: USER_AGENT.local,
     },
     otp: { type: String },
-    otpExpiry: { type: Date },
+    otpExpiryAt: { type: Date },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
