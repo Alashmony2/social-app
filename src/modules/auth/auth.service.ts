@@ -5,9 +5,11 @@ import { ConflictException } from "../../utils/error";
 import { AbstractRepository } from "../../DB/abstract.repository";
 import { IUser } from "../../utils/common/interface";
 import { UserRepository } from "../../DB/user/user.repository";
+import { AuthFactoryService } from "./factory";
 
 class AuthService {
   private userRepository = new UserRepository();
+  private authFactoryService = new AuthFactoryService
   constructor() {}
   async register(req: Request, res: Response, next: NextFunction) {
     //get data form request
@@ -19,8 +21,10 @@ class AuthService {
     if (userExist) {
       throw new ConflictException("User already exist");
     }
+    //prepare data
+    const user = this.authFactoryService.register(registerDto)
     //save into DB
-    const createdUser = await this.userRepository.create(registerDto);
+    const createdUser =  this.userRepository.create(user);
     //send response
     return res.status(201).json({
       message: "User Created Successfully",
