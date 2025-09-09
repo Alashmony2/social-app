@@ -1,11 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
-import { RegisterDTO } from "./auth.dto";
+import { LoginDTO, RegisterDTO } from "./auth.dto";
 import { User } from "../../DB/user/user.model";
-import { ConflictException } from "../../utils/error";
+import { ConflictException, NotAuthorizedException, NotFoundException } from "../../utils/error";
 import { AbstractRepository } from "../../DB/abstract.repository";
 import { IUser } from "../../utils/common/interface";
 import { UserRepository } from "../../DB/user/user.repository";
 import { AuthFactoryService } from "./factory";
+import { compareHash } from "../../utils/hash";
 
 class AuthService {
   private userRepository = new UserRepository();
@@ -32,5 +33,26 @@ class AuthService {
       data: createdUser,
     });
   };
+  login = async (req: Request, res: Response, next: NextFunction) => {
+    //get data form request
+    const loginDto: LoginDTO = req.body;
+    //check user exist
+    const userExist = await this.userRepository.exist({
+      email: loginDto.email,
+    });
+    if (!userExist) {
+      throw new NotFoundException("User not Found");
+    }
+    //check is password valid
+    const isPasswordValid = compareHash(loginDto.password,userExist.password)
+    if(!isPasswordValid){
+        throw new NotAuthorizedException("Invalid Credentials")
+    }
+    return res.status(201).json({
+      message: "User Login Successfully",
+      success: true,
+      data: userExist,
+    })
+  }
 }
 export default new AuthService();

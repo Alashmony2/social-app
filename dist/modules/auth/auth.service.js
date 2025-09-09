@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const error_1 = require("../../utils/error");
 const user_repository_1 = require("../../DB/user/user.repository");
 const factory_1 = require("./factory");
+const hash_1 = require("../../utils/hash");
 class AuthService {
     userRepository = new user_repository_1.UserRepository();
     authFactoryService = new factory_1.AuthFactoryService();
@@ -26,6 +27,27 @@ class AuthService {
             message: "User Created Successfully",
             success: true,
             data: createdUser,
+        });
+    };
+    login = async (req, res, next) => {
+        //get data form request
+        const loginDto = req.body;
+        //check user exist
+        const userExist = await this.userRepository.exist({
+            email: loginDto.email,
+        });
+        if (!userExist) {
+            throw new error_1.NotFoundException("User not Found");
+        }
+        //check is password valid
+        const isPasswordValid = (0, hash_1.compareHash)(loginDto.password, userExist.password);
+        if (!isPasswordValid) {
+            throw new error_1.NotAuthorizedException("Invalid Credentials");
+        }
+        return res.status(201).json({
+            message: "User Login Successfully",
+            success: true,
+            data: userExist,
         });
     };
 }
