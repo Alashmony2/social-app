@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { LoginDTO, RegisterDTO } from "./auth.dto";
+import { ConfirmEmailDTO, LoginDTO, RegisterDTO } from "./auth.dto";
 import { User } from "../../DB/user/user.model";
 import { ConflictException, NotAuthorizedException, NotFoundException } from "../../utils/error";
 import { AbstractRepository } from "../../DB/abstract.repository";
@@ -41,6 +41,33 @@ class AuthService {
     });
   };
 
+  confirmEmail = async (req: Request, res: Response, next: NextFunction)=>{
+    const confirmEmailDto : ConfirmEmailDTO = req.body;
+    const userExist = await this.userRepository.exist({
+      email: confirmEmailDto.email,
+    });
+    if (!userExist) {
+      throw new NotFoundException("User not Found");
+    }
+    //check otp
+    if(userExist.otp !== confirmEmailDto.otp){
+      throw new NotAuthorizedException("Invalid OTP")
+    }
+    //update user
+    userExist.otp = undefined as unknown as string;
+    userExist.otpExpiryAt = undefined as unknown as Date;
+    userExist.isVerified = true;
+    //save into DB
+    await this.userRepository.update({email:confirmEmailDto.email},userExist,{new:true} as any)
+    //send response
+    return res.status(200).json({
+      message: "User Email Confirmed Successfully",
+      success: true,
+      data: userExist,
+    })
+
+  }
+
 
   login = async (req: Request, res: Response, next: NextFunction) => {
     //get data form request
@@ -56,6 +83,9 @@ class AuthService {
     const isPasswordValid = compareHash(loginDto.password,userExist.password)
     if(!isPasswordValid){
         throw new NotAuthorizedException("Invalid Credentials")
+    }
+    if(!userExist.isVerified){
+      throw new NotAuthorizedException("Verify your account first")
     }
     return res.status(200).json({
       message: "User Login Successfully",

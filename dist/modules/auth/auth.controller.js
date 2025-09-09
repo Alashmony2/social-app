@@ -8,4 +8,5 @@ const auth_service_1 = __importDefault(require("./auth.service"));
 const router = (0, express_1.Router)();
 router.post("/register", auth_service_1.default.register);
 router.post("/login", auth_service_1.default.login);
+router.post("/confirm-email", auth_service_1.default.confirmEmail);
 exports.default = router;

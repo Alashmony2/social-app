@@ -36,6 +36,31 @@ class AuthService {
             data: createdUser,
         });
     };
+    confirmEmail = async (req, res, next) => {
+        const confirmEmailDto = req.body;
+        const userExist = await this.userRepository.exist({
+            email: confirmEmailDto.email,
+        });
+        if (!userExist) {
+            throw new error_1.NotFoundException("User not Found");
+        }
+        //check otp
+        if (userExist.otp !== confirmEmailDto.otp) {
+            throw new error_1.NotAuthorizedException("Invalid OTP");
+        }
+        //update user
+        userExist.otp = undefined;
+        userExist.otpExpiryAt = undefined;
+        userExist.isVerified = true;
+        //save into DB
+        await this.userRepository.update({ email: confirmEmailDto.email }, userExist, { new: true });
+        //send response
+        return res.status(200).json({
+            message: "User Email Confirmed Successfully",
+            success: true,
+            data: userExist,
+        });
+    };
     login = async (req, res, next) => {
         //get data form request
         const loginDto = req.body;
@@ -50,6 +75,9 @@ class AuthService {
         const isPasswordValid = (0, hash_1.compareHash)(loginDto.password, userExist.password);
         if (!isPasswordValid) {
             throw new error_1.NotAuthorizedException("Invalid Credentials");
+        }
+        if (!userExist.isVerified) {
+            throw new error_1.NotAuthorizedException("Verify your account first");
         }
         return res.status(200).json({
             message: "User Login Successfully",
