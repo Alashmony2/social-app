@@ -4,6 +4,7 @@ const error_1 = require("../../utils/error");
 const user_repository_1 = require("../../DB/user/user.repository");
 const factory_1 = require("./factory");
 const hash_1 = require("../../utils/hash");
+const email_1 = require("../../utils/email");
 class AuthService {
     userRepository = new user_repository_1.UserRepository();
     authFactoryService = new factory_1.AuthFactoryService();
@@ -22,6 +23,12 @@ class AuthService {
         const user = this.authFactoryService.register(registerDto);
         //save into DB
         const createdUser = await this.userRepository.create(user);
+        //send email
+        await (0, email_1.sendEmail)({
+            to: createdUser.email,
+            subject: "verify your email",
+            html: `<p>Your otp to verify your account is ${createdUser.otp}</p>`,
+        });
         //send response
         return res.status(201).json({
             message: "User Created Successfully",
@@ -44,7 +51,7 @@ class AuthService {
         if (!isPasswordValid) {
             throw new error_1.NotAuthorizedException("Invalid Credentials");
         }
-        return res.status(201).json({
+        return res.status(200).json({
             message: "User Login Successfully",
             success: true,
             data: userExist,

@@ -13,4 +13,5 @@ export interface IUser {
   userAgent: USER_AGENT;
   otp?: string;
   otpExpiryAt?: Date;
+  isVerified?: boolean;
 }

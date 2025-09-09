@@ -7,6 +7,7 @@ import { IUser } from "../../utils/common/interface";
 import { UserRepository } from "../../DB/user/user.repository";
 import { AuthFactoryService } from "./factory";
 import { compareHash } from "../../utils/hash";
+import { sendEmail } from "../../utils/email";
 
 class AuthService {
   private userRepository = new UserRepository();
@@ -25,7 +26,13 @@ class AuthService {
     //prepare data
     const user = this.authFactoryService.register(registerDto);
     //save into DB
-    const createdUser = await this.userRepository.create(user);
+    const createdUser = await this.userRepository.create(user) ;
+    //send email
+    await sendEmail({
+      to: createdUser.email,
+      subject: "verify your email",
+      html: `<p>Your otp to verify your account is ${createdUser.otp}</p>`,
+    })
     //send response
     return res.status(201).json({
       message: "User Created Successfully",
@@ -33,6 +40,8 @@ class AuthService {
       data: createdUser,
     });
   };
+
+
   login = async (req: Request, res: Response, next: NextFunction) => {
     //get data form request
     const loginDto: LoginDTO = req.body;
@@ -48,7 +57,7 @@ class AuthService {
     if(!isPasswordValid){
         throw new NotAuthorizedException("Invalid Credentials")
     }
-    return res.status(201).json({
+    return res.status(200).json({
       message: "User Login Successfully",
       success: true,
       data: userExist,

@@ -47,6 +47,7 @@ export const userSchema = new Schema<IUser>(
     },
     otp: { type: String },
     otpExpiryAt: { type: Date },
+    isVerified:{type:Boolean,default:false}
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
