@@ -15,4 +15,14 @@ function bootstrap(app, express) {
     app.use("/{*dummy}", (req, res, next) => {
         return res.status(404).json({ message: "invalid router", success: false });
     });
+    //global error handler
+    app.use((error, req, res, next) => {
+        return res
+            .status(error.statusCode)
+            .json({
+            message: error.message,
+            success: false,
+            errorDetails: error.errorDetails,
+        });
+    });
 }
