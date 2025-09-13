@@ -1,26 +1,30 @@
 export class AppError extends Error {
-  constructor(message: string, public statusCode: number) {
+  constructor(
+    message: string,
+    public statusCode: number,
+    public errorDetails?: object[]
+  ) {
     super(message);
   }
 }
 
 export class ConflictException extends AppError {
-  constructor(message: string) {
-    super(message, 409);
+  constructor(message: string,errorDetails?: object[]) {
+    super(message, 409,errorDetails);
   }
 }
 export class NotFoundException extends AppError {
-  constructor(message: string) {
-    super(message, 404);
+  constructor(message: string,errorDetails?: object[]) {
+    super(message, 404,errorDetails);
   }
 }
 export class NotAuthorizedException extends AppError {
-  constructor(message: string) {
-    super(message, 401);
+  constructor(message: string,errorDetails?: object[]) {
+    super(message, 401,errorDetails);
   }
 }
 export class BadRequestException extends AppError {
-  constructor(message: string) {
-    super(message, 400);
+  constructor(message: string,errorDetails?: object[]) {
+    super(message, 400,errorDetails);
   }
 }
