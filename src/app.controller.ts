@@ -1,7 +1,7 @@
 import { type Express } from "express";
 import authRouter from "./modules/auth/auth.controller";
 import { connectDB } from "./DB/connection";
-import type { Request, NextFunction, Response } from "express";
+import { Request, NextFunction, Response } from "express";
 import { AppError } from "./utils/error";
 export function bootstrap(app: Express, express: any) {
   connectDB();

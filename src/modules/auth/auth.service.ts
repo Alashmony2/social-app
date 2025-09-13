@@ -23,18 +23,7 @@ class AuthService {
   register = async (req: Request, res: Response, next: NextFunction) => {
     //get data form request
     const registerDto: RegisterDTO = req.body;
-    //validation
-    const result = authValidation.registerSchema.safeParse(registerDto);
-    console.log(result);
-    if (!result.success) {
-      let errMessages = result.error.issues.map((issue) => ({
-        path: issue.path[0],
-        message: issue.message,
-      }));
-      console.log(errMessages);
-      throw new BadRequestException("Validation Failed", errMessages);
-
-    }
+   
 
     //check user exist
     const userExist = await this.userRepository.exist({
