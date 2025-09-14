@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const error_1 = require("../../utils/error");
-const user_repository_1 = require("../../DB/user/user.repository");
+const utils_1 = require("../../utils");
+const DB_1 = require("../../DB");
 const factory_1 = require("./factory");
-const hash_1 = require("../../utils/hash");
-const email_1 = require("../../utils/email");
+const utils_2 = require("../../utils");
+const utils_3 = require("../../utils");
 class AuthService {
-    userRepository = new user_repository_1.UserRepository();
+    userRepository = new DB_1.UserRepository();
     authFactoryService = new factory_1.AuthFactoryService();
     constructor() { }
     register = async (req, res, next) => {
@@ -17,14 +17,14 @@ class AuthService {
             email: registerDto.email,
         });
         if (userExist) {
-            throw new error_1.ConflictException("User already exist");
+            throw new utils_1.ConflictException("User already exist");
         }
         //prepare data
         const user = this.authFactoryService.register(registerDto);
         //save into DB
         const createdUser = await this.userRepository.create(user);
         //send email
-        await (0, email_1.sendEmail)({
+        await (0, utils_3.sendEmail)({
             to: createdUser.email,
             subject: "verify your email",
             html: `<p>Your otp to verify your account is ${createdUser.otp}</p>`,
@@ -42,11 +42,11 @@ class AuthService {
             email: confirmEmailDto.email,
         });
         if (!userExist) {
-            throw new error_1.NotFoundException("User not Found");
+            throw new utils_1.NotFoundException("User not Found");
         }
         //check otp
         if (userExist.otp !== confirmEmailDto.otp) {
-            throw new error_1.NotAuthorizedException("Invalid OTP");
+            throw new utils_1.NotAuthorizedException("Invalid OTP");
         }
         //update user
         userExist.otp = undefined;
@@ -69,15 +69,15 @@ class AuthService {
             email: loginDto.email,
         });
         if (!userExist) {
-            throw new error_1.NotFoundException("User not Found");
+            throw new utils_1.NotFoundException("User not Found");
         }
         //check is password valid
-        const isPasswordValid = (0, hash_1.compareHash)(loginDto.password, userExist.password);
+        const isPasswordValid = (0, utils_2.compareHash)(loginDto.password, userExist.password);
         if (!isPasswordValid) {
-            throw new error_1.NotAuthorizedException("Invalid Credentials");
+            throw new utils_1.NotAuthorizedException("Invalid Credentials");
         }
         if (!userExist.isVerified) {
-            throw new error_1.NotAuthorizedException("Verify your account first");
+            throw new utils_1.NotAuthorizedException("Verify your account first");
         }
         return res.status(200).json({
             message: "User Login Successfully",

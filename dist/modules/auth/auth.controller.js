@@ -38,10 +38,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_service_1 = __importDefault(require("./auth.service"));
-const validation_middleware_1 = require("../../middleware/validation.middleware");
+const middleware_1 = require("../../middleware");
 const authValidation = __importStar(require("./auth.validation"));
 const router = (0, express_1.Router)();
-router.post("/register", (0, validation_middleware_1.isValid)(authValidation.registerSchema), auth_service_1.default.register);
+router.post("/register", (0, middleware_1.isValid)(authValidation.registerSchema), auth_service_1.default.register);
 router.post("/login", auth_service_1.default.login);
 router.post("/confirm-email", auth_service_1.default.confirmEmail);
 exports.default = router;

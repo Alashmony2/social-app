@@ -1,20 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
 import { ConfirmEmailDTO, LoginDTO, RegisterDTO } from "./auth.dto";
-import { User } from "../../DB/user/user.model";
 import {
-  BadRequestException,
   ConflictException,
   NotAuthorizedException,
   NotFoundException,
-} from "../../utils/error";
-import { AbstractRepository } from "../../DB/abstract.repository";
-import { IUser } from "../../utils/common/interface";
-import { UserRepository } from "../../DB/user/user.repository";
+} from "../../utils";
+import { UserRepository } from "../../DB";
 import { AuthFactoryService } from "./factory";
-import { compareHash } from "../../utils/hash";
-import { sendEmail } from "../../utils/email";
-import * as authValidation from "./auth.validation";
-import { log } from "console";
+import { compareHash } from "../../utils";
+import { sendEmail } from "../../utils";
 
 class AuthService {
   private userRepository = new UserRepository();
@@ -23,7 +17,6 @@ class AuthService {
   register = async (req: Request, res: Response, next: NextFunction) => {
     //get data form request
     const registerDto: RegisterDTO = req.body;
-   
 
     //check user exist
     const userExist = await this.userRepository.exist({

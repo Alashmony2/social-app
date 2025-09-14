@@ -1,6 +1,6 @@
 import { Router } from "express";
 import authService from "./auth.service";
-import { isValid } from "../../middleware/validation.middleware";
+import { isValid } from "../../middleware";
 
 import * as authValidation from "./auth.validation";
 

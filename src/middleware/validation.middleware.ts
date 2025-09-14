@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { BadRequestException } from "../utils/error";
+import { BadRequestException } from "../utils";
 import { ZodType } from "zod";
 
 export const isValid = (schema: ZodType) => {
