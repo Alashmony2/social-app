@@ -26,7 +26,7 @@ class AuthService {
       throw new ConflictException("User already exist");
     }
     //prepare data
-    const user = this.authFactoryService.register(registerDto);
+    const user = await this.authFactoryService.register(registerDto);
     //save into DB
     const createdUser = await this.userRepository.create(user);
     //send email
