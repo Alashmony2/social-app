@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
-import { IUser } from "../../../utils/common/interface";
-import { GENDER, SYS_ROLE, USER_AGENT } from "../../../utils/common/enum";
+import { IUser } from "../../../utils";
+import { GENDER, SYS_ROLE, USER_AGENT } from "../../../utils";
 
 export const userSchema = new Schema<IUser>(
   {

@@ -17,6 +17,7 @@ export class AuthFactoryService {
     user.gender = registerDTO.gender;
     user.role = SYS_ROLE.user;
     user.userAgent = USER_AGENT.local;
+    user.isVerified = false;
     return user;
   }
 }

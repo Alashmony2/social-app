@@ -1,4 +1,4 @@
-import { GENDER, SYS_ROLE, USER_AGENT } from "../../../utils/common/enum";
+import { GENDER, SYS_ROLE, USER_AGENT } from "../../../utils";
 
 export class User {
   public fullName!: string;
@@ -11,4 +11,6 @@ export class User {
   public userAgent!: USER_AGENT;
   public otp!: string;
   public otpExpiryAt!: Date;
+  public isVerified!: boolean;
+
 }

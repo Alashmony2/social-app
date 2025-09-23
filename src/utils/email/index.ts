@@ -1,11 +1,11 @@
 import nodemailer, { Transporter } from "nodemailer";
+import { devConfig } from "../../config/env/dev.config";
 
 interface EmailOptions {
   to: string;
   subject: string;
   html: string;
 }
-
 export async function sendEmail({
   to,
   subject,
@@ -16,13 +16,13 @@ export async function sendEmail({
     port: 587,
     secure: false,
     auth: {
-      user: process.env.EMAIL_USER as string,
-      pass: process.env.EMAIL_PASS as string,
+      user: devConfig.EMAIL_USER as string,
+      pass: devConfig.EMAIL_PASS as string,
     },
   });
 
   await transporter.sendMail({
-    from: `'Social App' <${process.env.EMAIL_USER}>`,
+    from: `'Social App' <${devConfig.EMAIL_USER}>`,
     to,
     subject,
     html,
