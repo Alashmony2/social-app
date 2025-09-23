@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { ConfirmEmailDTO, LoginDTO, RegisterDTO } from "./auth.dto";
 import {
+  BadRequestException,
   ConflictException,
   NotAuthorizedException,
   NotFoundException,
@@ -9,6 +10,7 @@ import {
 import { UserRepository } from "../../DB";
 import { AuthFactoryService } from "./factory";
 import { compareHash } from "../../utils";
+import { authProvider } from "./provider/auth.provider";
 
 class AuthService {
   private userRepository = new UserRepository();
@@ -46,43 +48,25 @@ class AuthService {
   </div>
 `,
     });
-    
+
     //send response
     return res.status(201).json({
       message: "User Created Successfully",
       success: true,
-      data: createdUser,
+      data: { id: createdUser.id },
     });
   };
 
   confirmEmail = async (req: Request, res: Response, next: NextFunction) => {
+    //get data from req
     const confirmEmailDto: ConfirmEmailDTO = req.body;
-    const userExist = await this.userRepository.exist({
-      email: confirmEmailDto.email,
-    });
-    if (!userExist) {
-      throw new NotFoundException("User not Found");
-    }
-    //check otp
-    if (userExist.otp !== confirmEmailDto.otp) {
-      throw new NotAuthorizedException("Invalid OTP");
-    }
-    //update user
-    userExist.otp = undefined as unknown as string;
-    userExist.otpExpiryAt = undefined as unknown as Date;
-    userExist.isVerified = true;
-    //save into DB
-    await this.userRepository.update(
+    await authProvider.checkOTP(confirmEmailDto);
+    this.userRepository.update(
       { email: confirmEmailDto.email },
-      userExist,
-      { new: true } as any
+      { isVerified: true, $unset:{otp:"",otpExpiryAt:""} }
     );
     //send response
-    return res.status(200).json({
-      message: "User Email Confirmed Successfully",
-      success: true,
-      data: userExist,
-    });
+    return res.sendStatus(204)
   };
 
   login = async (req: Request, res: Response, next: NextFunction) => {

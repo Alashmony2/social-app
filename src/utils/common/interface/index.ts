@@ -12,6 +12,6 @@ export interface IUser {
   gender: GENDER;
   userAgent: USER_AGENT;
   otp?: string;
-  otpExpiryAt?: Date;
+  otpExpiryAt: Date;
   isVerified?: boolean;
 }
