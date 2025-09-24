@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { IUser } from "../../../utils";
+import { IUser, sendMail } from "../../../utils";
 import { GENDER, SYS_ROLE, USER_AGENT } from "../../../utils";
 
 export const userSchema = new Schema<IUser>(
@@ -62,3 +62,22 @@ userSchema
     this.firstName = fName as string;
     this.lastName = lName as string;
   });
+
+userSchema.pre("save", async function (next) {
+  if(this.userAgent != USER_AGENT.google && this.isNew == true)
+  await sendMail({
+    to: this.email,
+    subject: "Confirm your email",
+    html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
+        <h2 style="color: #333; margin-bottom: 10px;">Confirm Your Email</h2>
+        <p style="font-size: 14px; color: #555; margin: 0 0 15px;">
+          Use the following OTP to confirm your account:
+        </p>
+        <div style="display: inline-block; padding: 12px 20px; font-size: 20px; font-weight: bold; color: #fff; background: #06b6d4; border-radius: 6px; letter-spacing: 3px;">
+          ${this.otp}
+        </div>
+      </div>
+    `,
+  });
+});

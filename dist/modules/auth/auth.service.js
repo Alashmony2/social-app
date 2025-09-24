@@ -23,23 +23,6 @@ class AuthService {
         const user = await this.authFactoryService.register(registerDto);
         //save into DB
         const createdUser = await this.userRepository.create(user);
-        //send email
-        await (0, utils_1.sendMail)({
-            to: registerDto.email,
-            subject: "Confirm your email",
-            html: `
-  <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">
-    <h2 style="color: #333; margin-bottom: 10px;">Confirm Your Email</h2>
-    <p style="font-size: 14px; color: #555; margin: 0 0 15px;">
-      Use the following OTP to confirm your account:
-    </p>
-    <div style="display: inline-block; padding: 12px 20px; font-size: 20px; font-weight: bold; color: #fff; background: #06b6d4; border-radius: 6px; letter-spacing: 3px;">
-      ${user.otp}
-    </div>
-    
-  </div>
-`,
-        });
         //send response
         return res.status(201).json({
             message: "User Created Successfully",
