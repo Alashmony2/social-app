@@ -2,13 +2,14 @@ import type { NextFunction, Request, Response } from "express";
 import { ConfirmEmailDTO, LoginDTO, RegisterDTO } from "./auth.dto";
 import {
   ConflictException,
+  ForbiddenException,
   NotAuthorizedException,
-  NotFoundException,
 } from "../../utils";
 import { UserRepository } from "../../DB";
 import { AuthFactoryService } from "./factory";
 import { compareHash } from "../../utils";
 import { authProvider } from "./provider/auth.provider";
+import { generateToken } from "../../utils";
 
 class AuthService {
   private userRepository = new UserRepository();
@@ -42,10 +43,10 @@ class AuthService {
     await authProvider.checkOTP(confirmEmailDto);
     this.userRepository.update(
       { email: confirmEmailDto.email },
-      { isVerified: true, $unset:{otp:"",otpExpiryAt:""} }
+      { isVerified: true, $unset: { otp: "", otpExpiryAt: "" } }
     );
     //send response
-    return res.sendStatus(204)
+    return res.sendStatus(204);
   };
 
   login = async (req: Request, res: Response, next: NextFunction) => {
@@ -56,20 +57,31 @@ class AuthService {
       email: loginDto.email,
     });
     if (!userExist) {
-      throw new NotFoundException("User not Found");
+      throw new ForbiddenException("Invalid Credentials");
     }
     //check is password valid
-    const isPasswordValid = await compareHash(loginDto.password, userExist.password);
+    const isPasswordValid = await compareHash(
+      loginDto.password,
+      userExist.password
+    );
     if (!isPasswordValid) {
-      throw new NotAuthorizedException("Invalid Credentials");
+      throw new ForbiddenException("Invalid Credentials");
     }
     if (!userExist.isVerified) {
       throw new NotAuthorizedException("Verify your account first");
     }
+    //generate token
+    const accessToken = generateToken({
+      payload: { _id: userExist._id, role: userExist.role },
+      options: {
+        expiresIn: "1d",
+      },
+    });
+
     return res.status(200).json({
-      message: "User Login Successfully",
+      message: " Login Successfully",
       success: true,
-      data: userExist,
+      data: {accessToken},
     });
   };
 }

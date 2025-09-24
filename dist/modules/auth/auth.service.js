@@ -5,6 +5,7 @@ const DB_1 = require("../../DB");
 const factory_1 = require("./factory");
 const utils_2 = require("../../utils");
 const auth_provider_1 = require("./provider/auth.provider");
+const utils_3 = require("../../utils");
 class AuthService {
     userRepository = new DB_1.UserRepository();
     authFactoryService = new factory_1.AuthFactoryService();
@@ -46,20 +47,27 @@ class AuthService {
             email: loginDto.email,
         });
         if (!userExist) {
-            throw new utils_1.NotFoundException("User not Found");
+            throw new utils_1.ForbiddenException("Invalid Credentials");
         }
         //check is password valid
         const isPasswordValid = await (0, utils_2.compareHash)(loginDto.password, userExist.password);
         if (!isPasswordValid) {
-            throw new utils_1.NotAuthorizedException("Invalid Credentials");
+            throw new utils_1.ForbiddenException("Invalid Credentials");
         }
         if (!userExist.isVerified) {
             throw new utils_1.NotAuthorizedException("Verify your account first");
         }
+        //generate token
+        const accessToken = (0, utils_3.generateToken)({
+            payload: { _id: userExist._id, role: userExist.role },
+            options: {
+                expiresIn: "1d",
+            },
+        });
         return res.status(200).json({
-            message: "User Login Successfully",
+            message: " Login Successfully",
             success: true,
-            data: userExist,
+            data: { accessToken },
         });
     };
 }
