@@ -49,7 +49,7 @@ class AuthService {
             throw new utils_1.NotFoundException("User not Found");
         }
         //check is password valid
-        const isPasswordValid = (0, utils_2.compareHash)(loginDto.password, userExist.password);
+        const isPasswordValid = await (0, utils_2.compareHash)(loginDto.password, userExist.password);
         if (!isPasswordValid) {
             throw new utils_1.NotAuthorizedException("Invalid Credentials");
         }

@@ -1,11 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
 import { ConfirmEmailDTO, LoginDTO, RegisterDTO } from "./auth.dto";
 import {
-  BadRequestException,
   ConflictException,
   NotAuthorizedException,
   NotFoundException,
-  sendMail,
 } from "../../utils";
 import { UserRepository } from "../../DB";
 import { AuthFactoryService } from "./factory";
@@ -61,7 +59,7 @@ class AuthService {
       throw new NotFoundException("User not Found");
     }
     //check is password valid
-    const isPasswordValid = compareHash(loginDto.password, userExist.password);
+    const isPasswordValid = await compareHash(loginDto.password, userExist.password);
     if (!isPasswordValid) {
       throw new NotAuthorizedException("Invalid Credentials");
     }
