@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
-import { IPost, REACTION } from "../../../utils";
+import { IPost, IReaction, REACTION } from "../../../utils";
 
-const reactionSchema = new Schema(
+const reactionSchema = new Schema<IReaction>(
   {
     reaction: {
       type: Number,
@@ -26,13 +26,13 @@ export const postSchema = new Schema<IPost>(
     },
     content: {
       type: String,
-      required: function () {
-        if (this.attachments.length) return false;
-        return true;
-      },
+      // required: function () {
+      //   if (this.attachments.length) return false;
+      //   return true;
+      // },
       trim: true,
     },
-    likes: [reactionSchema],
+    reactions: [reactionSchema],
   },
   { timestamps: true }
 );

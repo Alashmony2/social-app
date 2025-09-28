@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { GENDER, SYS_ROLE, USER_AGENT } from "../enum";
+import { GENDER, REACTION, SYS_ROLE, USER_AGENT } from "../enum";
 import { ObjectId } from "mongoose";
 
 export interface IAttachment {
@@ -27,10 +27,15 @@ export interface IUser {
   _id: ObjectId;
 }
 
+export interface IReaction {
+  reaction: REACTION;
+  userId: ObjectId;
+}
+
 export interface IPost {
   userId: ObjectId;
   content: string;
-  likes: ObjectId[];
+  reactions: IReaction[];
   attachments: IAttachment[];
 }
 
