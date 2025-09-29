@@ -31,10 +31,20 @@ class PostService {
     //check post existence
     const postExist = await this.postRepository.exist({ _id: id });
     if (!postExist) throw new NotFoundException("Post not found");
-    await this.postRepository.update(
-      { _id: id },
-      { $push: { reactions: { reaction, userId } } }
-    );
+    let userReactedIndex = postExist.reactions.findIndex((reaction) => {
+      return reaction.userId.toString() == userId.toString();
+    });
+    if (userReactedIndex == -1)
+      await this.postRepository.update(
+        { _id: id },
+        { $push: { reactions: { reaction, userId } } }
+      );
+    else {
+      await this.postRepository.update(
+        { _id: id, "reactions.userId": userId },
+        { "reactions.$.reaction": reaction }
+      );
+    }
     //send response
     return res.status(200).json({
       message: "Reaction added successfully",
