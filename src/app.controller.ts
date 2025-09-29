@@ -19,7 +19,7 @@ export function bootstrap(app: Express, express: any) {
   //global error handler
   app.use(
     (error: AppError, req: Request, res: Response, next: NextFunction) => {
-      return res.status(error.statusCode).json({
+      return res.status(error.statusCode ||500).json({
         message: error.message,
         success: false,
         errorDetails: error.errorDetails,
