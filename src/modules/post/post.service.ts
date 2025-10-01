@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
-import { PostRepository } from "./../../DB/model/post/post.repository";
+import { PostRepository } from "./../../DB";
 import { NotFoundException } from "../../utils";
 
 class PostService {
@@ -34,12 +34,12 @@ class PostService {
     let userReactedIndex = postExist.reactions.findIndex((reaction) => {
       return reaction.userId.toString() == userId.toString();
     });
-    if (userReactedIndex == -1)
+    if (userReactedIndex == -1) {
       await this.postRepository.update(
         { _id: id },
         { $push: { reactions: { reaction, userId } } }
       );
-    else {
+    } else {
       await this.postRepository.update(
         { _id: id, "reactions.userId": userId },
         { "reactions.$.reaction": reaction }

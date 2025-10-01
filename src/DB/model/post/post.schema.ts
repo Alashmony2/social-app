@@ -1,21 +1,8 @@
 import { Schema } from "mongoose";
-import { IPost, IReaction, REACTION } from "../../../utils";
+import { IPost } from "../../../utils";
+import { reactionSchema } from "../common";
 
-const reactionSchema = new Schema<IReaction>(
-  {
-    reaction: {
-      type: Number,
-      enum: REACTION,
-      default: REACTION.like,
-    },
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
+
 
 export const postSchema = new Schema<IPost>(
   {
