@@ -6,7 +6,7 @@ export const reactionSchema = new Schema<IReaction>(
     reaction: {
       type: Number,
       enum: REACTION,
-      default: REACTION.like,
+      set: (value) => Number(value),
     },
     userId: {
       type: Schema.Types.ObjectId,

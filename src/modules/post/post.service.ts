@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "./../../DB";
-import { NotFoundException } from "../../utils";
+import { NotFoundException, REACTION } from "../../utils";
 
 class PostService {
   private readonly postFactoryService = new PostFactoryService();
@@ -37,8 +37,20 @@ class PostService {
     if (userReactedIndex == -1) {
       await this.postRepository.update(
         { _id: id },
-        { $push: { reactions: { reaction, userId } } }
+        {
+          $push: {
+            reactions: {
+              reaction,
+              userId,
+            },
+          },
+        }
       );
+    } else if ([undefined, null, ""].includes(reaction)) {
+      await this.postRepository.update(
+        { _id: id },
+        { $pull: { reactions: postExist.reactions[userReactedIndex] } }
+      ); 
     } else {
       await this.postRepository.update(
         { _id: id, "reactions.userId": userId },
@@ -46,10 +58,7 @@ class PostService {
       );
     }
     //send response
-    return res.status(200).json({
-      message: "Reaction added successfully",
-      success: true,
-    });
+    return res.sendStatus(204);
   };
 }
 
