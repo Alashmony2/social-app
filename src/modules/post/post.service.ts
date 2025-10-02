@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "./../../DB";
-import { NotFoundException, REACTION } from "../../utils";
+import { NotFoundException } from "../../utils";
 
 class PostService {
   private readonly postFactoryService = new PostFactoryService();
@@ -50,7 +50,7 @@ class PostService {
       await this.postRepository.update(
         { _id: id },
         { $pull: { reactions: postExist.reactions[userReactedIndex] } }
-      ); 
+      );
     } else {
       await this.postRepository.update(
         { _id: id, "reactions.userId": userId },
@@ -59,6 +59,26 @@ class PostService {
     }
     //send response
     return res.sendStatus(204);
+  };
+
+  public getSpecific = async (req: Request, res: Response) => {
+    //get data from req
+    const { id } = req.params;
+    const post = await this.postRepository.getOne(
+      { _id: id },
+      {},
+      {
+        populate: [
+          { path: "userId", select: "fullName firstName lastName" },
+          { path: "reactions.userId", select: "fullName firstName lastName" },
+        ],
+      }
+    );
+    console.log(post.populate);
+    if (!post) throw new NotFoundException("Post not found");
+    return res
+      .status(200)
+      .json({ message: "done", success: true, data: { post } });
   };
 }
 

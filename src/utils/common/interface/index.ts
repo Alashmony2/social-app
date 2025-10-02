@@ -46,6 +46,6 @@ export interface IPayload extends JwtPayload {
 
 declare module "express" {
   interface Request {
-    user?: IUser;
+    user?: IUser ;
   }
 }
