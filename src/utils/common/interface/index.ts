@@ -39,6 +39,16 @@ export interface IPost {
   attachments: IAttachment[];
 }
 
+export interface IComment {
+  userId: ObjectId;
+  postId: ObjectId;
+  parentIds: ObjectId[];
+  content: string;
+  attachment: IAttachment;
+  reactions: IReaction;
+  mentions?: ObjectId[];
+}
+
 export interface IPayload extends JwtPayload {
   _id: string;
   role: string;
@@ -46,6 +56,6 @@ export interface IPayload extends JwtPayload {
 
 declare module "express" {
   interface Request {
-    user?: IUser ;
+    user?: IUser;
   }
 }
