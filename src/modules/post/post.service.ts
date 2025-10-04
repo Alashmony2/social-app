@@ -71,6 +71,7 @@ class PostService {
         populate: [
           { path: "userId", select: "fullName firstName lastName" },
           { path: "reactions.userId", select: "fullName firstName lastName" },
+          { path: "comments" ,match:{parentIds:[]}},
         ],
       }
     );
