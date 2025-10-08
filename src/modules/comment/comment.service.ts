@@ -8,6 +8,7 @@ import {
 } from "../../utils";
 import { CommentFactoryService } from "./factory";
 import { CreateCommentDTO } from "./comment.dto";
+import { addReactionProvider } from "../../utils/common/providers/react.provider";
 
 class CommentService {
   private readonly postRepository = new PostRepository();
@@ -73,7 +74,8 @@ class CommentService {
     //check authorization
     if (
       commentExist.userId.toString() != req.user._id.toString() &&
-      (commentExist.postId as unknown as IPost).userId.toString() != req.user._id.toString()
+      (commentExist.postId as unknown as IPost).userId.toString() !=
+        req.user._id.toString()
     )
       throw new NotAuthorizedException(
         "You are not authorized to delete this comment"
@@ -85,6 +87,15 @@ class CommentService {
       message: "Comment deleted successfully",
       success: true,
     });
+  };
+
+  public addReaction = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { reaction } = req.body;
+    //add reaction
+    await addReactionProvider(this.commentRepository,id,req.user._id,reaction)
+    //send response
+    return res.sendStatus(204);
   };
 }
 export default new CommentService();

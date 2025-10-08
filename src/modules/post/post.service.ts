@@ -3,6 +3,7 @@ import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "./../../DB";
 import { NotAuthorizedException, NotFoundException } from "../../utils";
+import { addReactionProvider } from "../../utils/common/providers/react.provider";
 
 class PostService {
   private readonly postFactoryService = new PostFactoryService();
@@ -28,35 +29,7 @@ class PostService {
     const { id } = req.params;
     const { reaction } = req.body;
     const userId = req.user._id;
-    //check post existence
-    const postExist = await this.postRepository.exist({ _id: id });
-    if (!postExist) throw new NotFoundException("Post not found");
-    let userReactedIndex = postExist.reactions.findIndex((reaction) => {
-      return reaction.userId.toString() == userId.toString();
-    });
-    if (userReactedIndex == -1) {
-      await this.postRepository.update(
-        { _id: id },
-        {
-          $push: {
-            reactions: {
-              reaction,
-              userId,
-            },
-          },
-        }
-      );
-    } else if ([undefined, null, ""].includes(reaction)) {
-      await this.postRepository.update(
-        { _id: id },
-        { $pull: { reactions: postExist.reactions[userReactedIndex] } }
-      );
-    } else {
-      await this.postRepository.update(
-        { _id: id, "reactions.userId": userId },
-        { "reactions.$.reaction": reaction }
-      );
-    }
+    addReactionProvider(this.postRepository,id,userId,reaction)
     //send response
     return res.sendStatus(204);
   };
@@ -81,6 +54,7 @@ class PostService {
       .status(200)
       .json({ message: "done", success: true, data: { post } });
   };
+  
   public deletePost = async (req: Request, res: Response) => {
     //get data from request
     const { id } = req.params;
