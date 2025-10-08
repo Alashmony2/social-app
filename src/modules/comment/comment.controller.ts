@@ -4,4 +4,5 @@ import commentService from "./comment.service";
 
 const router = Router({mergeParams:true});
 router.post("{/:id}",isAuthenticated(),commentService.create)
+router.get("/:id",isAuthenticated(),commentService.getSpecific)
 export default router;

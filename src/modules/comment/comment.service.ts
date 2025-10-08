@@ -31,13 +31,28 @@ class CommentService {
     //create into DB
     const createdComment = await this.commentRepository.create(comment);
     //send Response
-    return res
-      .status(201)
-      .json({
-        message: "Comment created successfully",
-        success: true,
-        data: { createdComment },
-      });
+    return res.status(201).json({
+      message: "Comment created successfully",
+      success: true,
+      data: { createdComment },
+    });
+  };
+
+  getSpecific = async (req: Request, res: Response) => {
+    //get data from request
+    const { id } = req.params;
+    const commentExist = await this.commentRepository.exist(
+      { _id: id },
+      {},
+      {populate:[{path:"replies"}]}
+    );
+    if (!commentExist) throw new NotFoundException("Comment not found");
+    // send response
+    return res.status(200).json({
+      message: "Comment fetch successfully",
+      success: true,
+      data: { commentExist },
+    });
   };
 }
 export default new CommentService();
