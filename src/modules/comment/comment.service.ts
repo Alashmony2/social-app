@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { CommentRepository, PostRepository } from "../../DB";
-import { IComment, NotFoundException } from "../../utils";
+import {
+  IComment,
+  IPost,
+  NotAuthorizedException,
+  NotFoundException,
+} from "../../utils";
 import { CommentFactoryService } from "./factory";
 import { CreateCommentDTO } from "./comment.dto";
 
@@ -59,17 +64,27 @@ class CommentService {
     //get data from request
     const { id } = req.params;
     //check comment exist
-    const commentExist = await this.commentRepository.exist({ _id: id });
+    const commentExist = await this.commentRepository.exist(
+      { _id: id },
+      {},
+      { populate: [{ path: "postId", select: "userId" }] }
+    );
     if (!commentExist) throw new NotFoundException("Comment not found");
+    //check authorization
+    if (
+      commentExist.userId.toString() != req.user._id.toString() &&
+      (commentExist.postId as unknown as IPost).userId.toString() != req.user._id.toString()
+    )
+      throw new NotAuthorizedException(
+        "You are not authorized to delete this comment"
+      );
     //delete from DB
     await this.commentRepository.delete({ _id: id });
     //send response
-    return res
-      .status(200)
-      .json({
-        message: "Comment deleted successfully",
-        success: true,
-      });
+    return res.status(200).json({
+      message: "Comment deleted successfully",
+      success: true,
+    });
   };
 }
 export default new CommentService();
