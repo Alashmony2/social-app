@@ -44,7 +44,7 @@ export interface IComment {
   _id:ObjectId;
   userId: ObjectId;
   postId: ObjectId;
-  parentIds: ObjectId[];
+  parentId: ObjectId | null;
   content: string;
   attachment: IAttachment;
   reactions: IReaction[];

@@ -3,7 +3,6 @@ import { CommentRepository, PostRepository } from "../../DB";
 import { IComment, NotFoundException } from "../../utils";
 import { CommentFactoryService } from "./factory";
 import { CreateCommentDTO } from "./comment.dto";
-import { success } from "zod";
 
 class CommentService {
   private readonly postRepository = new PostRepository();
