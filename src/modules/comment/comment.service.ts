@@ -8,7 +8,7 @@ class CommentService {
   private readonly postRepository = new PostRepository();
   private readonly commentRepository = new CommentRepository();
   private readonly commentFactoryService = new CommentFactoryService();
-  create = async (req: Request, res: Response) => {
+  public create = async (req: Request, res: Response) => {
     //get data from req
     const { postId, id } = req.params;
     const createCommentDTO: CreateCommentDTO = req.body;
@@ -38,13 +38,13 @@ class CommentService {
     });
   };
 
-  getSpecific = async (req: Request, res: Response) => {
+  public getSpecific = async (req: Request, res: Response) => {
     //get data from request
     const { id } = req.params;
     const commentExist = await this.commentRepository.exist(
       { _id: id },
       {},
-      {populate:[{path:"replies"}]}
+      { populate: [{ path: "replies" }] }
     );
     if (!commentExist) throw new NotFoundException("Comment not found");
     // send response
@@ -53,6 +53,23 @@ class CommentService {
       success: true,
       data: { commentExist },
     });
+  };
+
+  public deleteComment = async (req: Request, res: Response) => {
+    //get data from request
+    const { id } = req.params;
+    //check comment exist
+    const commentExist = await this.commentRepository.exist({ _id: id });
+    if (!commentExist) throw new NotFoundException("Comment not found");
+    //delete from DB
+    await this.commentRepository.delete({ _id: id });
+    //send response
+    return res
+      .status(200)
+      .json({
+        message: "Comment deleted successfully",
+        success: true,
+      });
   };
 }
 export default new CommentService();
