@@ -15,3 +15,8 @@ export interface ConfirmEmailDTO {
     email: string;
     otp: string;
 }
+export interface UpdatePasswordDTO {
+    email: string;
+    oldPassword: string;
+    newPassword: string;
+}

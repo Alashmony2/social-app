@@ -1,5 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
-import { ConfirmEmailDTO, LoginDTO, RegisterDTO } from "./auth.dto";
+import {
+  ConfirmEmailDTO,
+  LoginDTO,
+  RegisterDTO,
+  UpdatePasswordDTO,
+} from "./auth.dto";
 import {
   ConflictException,
   ForbiddenException,
@@ -7,7 +12,7 @@ import {
 } from "../../utils";
 import { UserRepository } from "../../DB";
 import { AuthFactoryService } from "./factory";
-import { compareHash } from "../../utils";
+import { compareHash, generateHash } from "../../utils";
 import { authProvider } from "./provider/auth.provider";
 import { generateToken } from "../../utils";
 
@@ -81,8 +86,34 @@ class AuthService {
     return res.status(200).json({
       message: " Login Successfully",
       success: true,
-      data: {accessToken},
+      data: { accessToken },
     });
+  };
+
+  updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+    // get data from request
+    const updatePasswordDTO: UpdatePasswordDTO = req.body;
+    // check user exist
+    const userExist = await this.userRepository.exist({ email: updatePasswordDTO.email });
+    if (!userExist) {
+      throw new ForbiddenException("Invalid Credentials");
+    }
+    // validate old password
+    const isOldValid = await compareHash(updatePasswordDTO.oldPassword, userExist.password);
+    if (!isOldValid) {
+      throw new ForbiddenException("Invalid Credentials");
+    }
+    // hash new password and update
+    const newHashed = await generateHash(updatePasswordDTO.newPassword);
+    await this.userRepository.update(
+      { email: updatePasswordDTO.email },
+      {
+        password: newHashed,
+        credentialUpdatedAt: new Date() as unknown as Date,
+      }
+    );
+    // send response
+    return res.status(200).json({message:"Password updated successfully",success:true});
   };
 }
 export default new AuthService();

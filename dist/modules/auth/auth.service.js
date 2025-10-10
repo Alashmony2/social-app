@@ -70,5 +70,27 @@ class AuthService {
             data: { accessToken },
         });
     };
+    updatePassword = async (req, res, next) => {
+        // get data from request
+        const updatePasswordDTO = req.body;
+        // check user exist
+        const userExist = await this.userRepository.exist({ email: updatePasswordDTO.email });
+        if (!userExist) {
+            throw new utils_1.ForbiddenException("Invalid Credentials");
+        }
+        // validate old password
+        const isOldValid = await (0, utils_2.compareHash)(updatePasswordDTO.oldPassword, userExist.password);
+        if (!isOldValid) {
+            throw new utils_1.ForbiddenException("Invalid Credentials");
+        }
+        // hash new password and update
+        const newHashed = await (0, utils_2.generateHash)(updatePasswordDTO.newPassword);
+        await this.userRepository.update({ email: updatePasswordDTO.email }, {
+            password: newHashed,
+            credentialUpdatedAt: new Date(),
+        });
+        // send response
+        return res.status(200).json({ message: "Password updated successfully", success: true });
+    };
 }
 exports.default = new AuthService();
