@@ -4,6 +4,7 @@ import {
   LoginDTO,
   RegisterDTO,
   UpdateBasicInfoDTO,
+  UpdateEmailDTO,
   UpdatePasswordDTO,
 } from "./auth.dto";
 import {
@@ -159,6 +160,37 @@ class AuthService {
         message: "Profile updated successfully",
         success: { data: userExist },
       });
+  };
+  
+  updateEmail = async (req: Request, res: Response, next: NextFunction) => {
+    //get data from request
+    const updateEmailDTO: UpdateEmailDTO = req.body;
+    // check user exist
+    const userExist = await this.userRepository.exist({
+      email: updateEmailDTO.oldEmail,
+    });
+    if (!userExist) {
+      throw new NotFoundException("User not found");
+    }
+    // validate old password
+    const isOldValid = await compareHash(
+      updateEmailDTO.password,
+      userExist.password
+    );
+    if (!isOldValid) {
+      throw new NotAuthorizedException("Incorrect password");
+    }
+    // check new email already in use
+    const newEmailExists = await this.userRepository.exist({ email: updateEmailDTO.newEmail });
+    if (newEmailExists) throw new ConflictException("Email already in use");
+    // update email
+    await this.userRepository.update(
+      { email: updateEmailDTO.oldEmail },
+      { email: updateEmailDTO.newEmail }
+    );
+    return res
+      .status(200)
+      .json({ message: "Email updated successfully", success: true });
   };
 }
 export default new AuthService();

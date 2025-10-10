@@ -21,4 +21,10 @@ router.patch(
   isValid(authValidation.updateBasicInfoSchema),
   authService.updateBasicInfo
 );
+router.patch(
+  "/update-email",
+  isAuthenticated(),
+  isValid(authValidation.updateEmailSchema),
+  authService.updateEmail
+);
 export default router;

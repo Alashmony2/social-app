@@ -126,5 +126,30 @@ class AuthService {
             success: { data: userExist },
         });
     };
+    updateEmail = async (req, res, next) => {
+        //get data from request
+        const updateEmailDTO = req.body;
+        // check user exist
+        const userExist = await this.userRepository.exist({
+            email: updateEmailDTO.oldEmail,
+        });
+        if (!userExist) {
+            throw new utils_1.NotFoundException("User not found");
+        }
+        // validate old password
+        const isOldValid = await (0, utils_2.compareHash)(updateEmailDTO.password, userExist.password);
+        if (!isOldValid) {
+            throw new utils_1.NotAuthorizedException("Incorrect password");
+        }
+        // check new email already in use
+        const newEmailExists = await this.userRepository.exist({ email: updateEmailDTO.newEmail });
+        if (newEmailExists)
+            throw new utils_1.ConflictException("Email already in use");
+        // update email
+        await this.userRepository.update({ email: updateEmailDTO.oldEmail }, { email: updateEmailDTO.newEmail });
+        return res
+            .status(200)
+            .json({ message: "Email updated successfully", success: true });
+    };
 }
 exports.default = new AuthService();

@@ -47,4 +47,5 @@ router.post("/login", auth_service_1.default.login);
 router.post("/confirm-email", auth_service_1.default.confirmEmail);
 router.post("/update-password", (0, auth_middleware_1.isAuthenticated)(), auth_service_1.default.updatePassword);
 router.patch("/update-basic-info", (0, auth_middleware_1.isAuthenticated)(), (0, middleware_1.isValid)(authValidation.updateBasicInfoSchema), auth_service_1.default.updateBasicInfo);
+router.patch("/update-email", (0, auth_middleware_1.isAuthenticated)(), (0, middleware_1.isValid)(authValidation.updateEmailSchema), auth_service_1.default.updateEmail);
 exports.default = router;

@@ -25,3 +25,8 @@ export interface UpdateBasicInfoDTO {
   fullName?: string;
   gender?: GENDER;
 }
+export interface UpdateEmailDTO {
+  oldEmail: string;
+  newEmail: string;
+  password: string;
+}
