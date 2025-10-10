@@ -74,7 +74,9 @@ class AuthService {
         // get data from request
         const updatePasswordDTO = req.body;
         // check user exist
-        const userExist = await this.userRepository.exist({ email: updatePasswordDTO.email });
+        const userExist = await this.userRepository.exist({
+            email: updatePasswordDTO.email,
+        });
         if (!userExist) {
             throw new utils_1.ForbiddenException("Invalid Credentials");
         }
@@ -90,7 +92,39 @@ class AuthService {
             credentialUpdatedAt: new Date(),
         });
         // send response
-        return res.status(200).json({ message: "Password updated successfully", success: true });
+        return res
+            .status(200)
+            .json({ message: "Password updated successfully", success: true });
+    };
+    updateBasicInfo = async (req, res, next) => {
+        //get data from request
+        const updateBasicInfoDTO = req.body;
+        // check user exist
+        const userExist = await this.userRepository.exist({
+            email: updateBasicInfoDTO.email,
+        });
+        if (!userExist) {
+            throw new utils_1.NotFoundException("User not found");
+        }
+        //update user
+        let firstName = userExist.firstName;
+        let lastName = userExist.lastName;
+        if (updateBasicInfoDTO.fullName) {
+            const [fName, lName] = updateBasicInfoDTO.fullName.split(" ");
+            firstName = fName || firstName;
+            lastName = lName || lastName;
+        }
+        await this.userRepository.update({ email: updateBasicInfoDTO.email }, {
+            firstName,
+            lastName,
+            gender: updateBasicInfoDTO.gender,
+        });
+        return res
+            .status(200)
+            .json({
+            message: "Profile updated successfully",
+            success: { data: userExist },
+        });
     };
 }
 exports.default = new AuthService();

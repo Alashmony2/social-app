@@ -15,4 +15,10 @@ router.post(
 router.post("/login", authService.login);
 router.post("/confirm-email", authService.confirmEmail);
 router.post("/update-password", isAuthenticated(), authService.updatePassword);
+router.patch(
+  "/update-basic-info",
+  isAuthenticated(),
+  isValid(authValidation.updateBasicInfoSchema),
+  authService.updateBasicInfo
+);
 export default router;

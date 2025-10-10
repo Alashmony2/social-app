@@ -3,12 +3,15 @@ import {
   ConfirmEmailDTO,
   LoginDTO,
   RegisterDTO,
+  UpdateBasicInfoDTO,
   UpdatePasswordDTO,
 } from "./auth.dto";
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotAuthorizedException,
+  NotFoundException,
 } from "../../utils";
 import { UserRepository } from "../../DB";
 import { AuthFactoryService } from "./factory";
@@ -94,12 +97,17 @@ class AuthService {
     // get data from request
     const updatePasswordDTO: UpdatePasswordDTO = req.body;
     // check user exist
-    const userExist = await this.userRepository.exist({ email: updatePasswordDTO.email });
+    const userExist = await this.userRepository.exist({
+      email: updatePasswordDTO.email,
+    });
     if (!userExist) {
       throw new ForbiddenException("Invalid Credentials");
     }
     // validate old password
-    const isOldValid = await compareHash(updatePasswordDTO.oldPassword, userExist.password);
+    const isOldValid = await compareHash(
+      updatePasswordDTO.oldPassword,
+      userExist.password
+    );
     if (!isOldValid) {
       throw new ForbiddenException("Invalid Credentials");
     }
@@ -113,7 +121,44 @@ class AuthService {
       }
     );
     // send response
-    return res.status(200).json({message:"Password updated successfully",success:true});
+    return res
+      .status(200)
+      .json({ message: "Password updated successfully", success: true });
+  };
+
+  updateBasicInfo = async (req: Request, res: Response, next: NextFunction) => {
+    //get data from request
+    const updateBasicInfoDTO: UpdateBasicInfoDTO = req.body;
+    // check user exist
+    const userExist = await this.userRepository.exist({
+      email: updateBasicInfoDTO.email,
+    });
+    if (!userExist) {
+      throw new NotFoundException("User not found");
+    }
+    //update user
+    let firstName = userExist.firstName;
+    let lastName = userExist.lastName;
+    if (updateBasicInfoDTO.fullName) {
+      const [fName, lName] = updateBasicInfoDTO.fullName.split(" ");
+      firstName = fName || firstName;
+      lastName = lName || lastName;
+    }
+
+    await this.userRepository.update(
+      { email: updateBasicInfoDTO.email },
+      {
+        firstName,
+        lastName,
+        gender: updateBasicInfoDTO.gender,
+      }
+    );
+    return res
+      .status(200)
+      .json({
+        message: "Profile updated successfully",
+        success: { data: userExist },
+      });
   };
 }
 export default new AuthService();

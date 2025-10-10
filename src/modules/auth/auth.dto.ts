@@ -1,22 +1,27 @@
 import { GENDER } from "../../utils/common/enum";
 
 export interface RegisterDTO {
-      fullName?: string;
-      email: string;
-      password: string;
-      phoneNumber?: string;
-      gender: GENDER;
+  fullName?: string;
+  email: string;
+  password: string;
+  phoneNumber?: string;
+  gender: GENDER;
 }
 export interface LoginDTO {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 export interface ConfirmEmailDTO {
-    email: string;
-    otp: string;
+  email: string;
+  otp: string;
 }
 export interface UpdatePasswordDTO {
-    email: string;
-    oldPassword: string;
-    newPassword: string;
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}
+export interface UpdateBasicInfoDTO {
+  email: string;
+  fullName?: string;
+  gender?: GENDER;
 }
