@@ -119,9 +119,7 @@ class AuthService {
             lastName,
             gender: updateBasicInfoDTO.gender,
         });
-        return res
-            .status(200)
-            .json({
+        return res.status(200).json({
             message: "Profile updated successfully",
             success: { data: userExist },
         });
@@ -142,7 +140,9 @@ class AuthService {
             throw new utils_1.NotAuthorizedException("Incorrect password");
         }
         // check new email already in use
-        const newEmailExists = await this.userRepository.exist({ email: updateEmailDTO.newEmail });
+        const newEmailExists = await this.userRepository.exist({
+            email: updateEmailDTO.newEmail,
+        });
         if (newEmailExists)
             throw new utils_1.ConflictException("Email already in use");
         // update email

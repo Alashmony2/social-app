@@ -8,7 +8,6 @@ import {
   UpdatePasswordDTO,
 } from "./auth.dto";
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotAuthorizedException,
@@ -154,14 +153,12 @@ class AuthService {
         gender: updateBasicInfoDTO.gender,
       }
     );
-    return res
-      .status(200)
-      .json({
-        message: "Profile updated successfully",
-        success: { data: userExist },
-      });
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      success: { data: userExist },
+    });
   };
-  
+
   updateEmail = async (req: Request, res: Response, next: NextFunction) => {
     //get data from request
     const updateEmailDTO: UpdateEmailDTO = req.body;
@@ -181,7 +178,9 @@ class AuthService {
       throw new NotAuthorizedException("Incorrect password");
     }
     // check new email already in use
-    const newEmailExists = await this.userRepository.exist({ email: updateEmailDTO.newEmail });
+    const newEmailExists = await this.userRepository.exist({
+      email: updateEmailDTO.newEmail,
+    });
     if (newEmailExists) throw new ConflictException("Email already in use");
     // update email
     await this.userRepository.update(
