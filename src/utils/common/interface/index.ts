@@ -21,6 +21,7 @@ export interface IUser {
   otp?: string;
   otpExpiryAt: Date;
   isVerified?: boolean;
+  friends: ObjectId[];
 }
 
 export interface IUser {
@@ -33,7 +34,7 @@ export interface IReaction {
 }
 
 export interface IPost {
-  _id:ObjectId;
+  _id: ObjectId;
   userId: ObjectId;
   content: string;
   reactions: IReaction[];
@@ -41,7 +42,7 @@ export interface IPost {
 }
 
 export interface IComment {
-  _id:ObjectId;
+  _id: ObjectId;
   userId: ObjectId;
   postId: ObjectId;
   parentId: ObjectId | null;
