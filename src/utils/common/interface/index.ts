@@ -52,6 +52,16 @@ export interface IComment {
   mentions?: ObjectId[];
 }
 
+export interface IMessage {
+  content: string;
+  sender: ObjectId;
+}
+
+export interface IChat {
+  users: ObjectId[];
+  messages: ObjectId[];
+}
+
 export interface IPayload extends JwtPayload {
   _id: string;
   role: string;
