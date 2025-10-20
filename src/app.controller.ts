@@ -1,5 +1,5 @@
 import { type Express } from "express";
-import { authRouter, postRouter, userRouter, commentRouter } from "./modules";
+import { authRouter, postRouter, userRouter, commentRouter, chatRouter } from "./modules";
 import { connectDB } from "./DB";
 import { Request, NextFunction, Response } from "express";
 import { AppError } from "./utils";
@@ -17,6 +17,8 @@ export function bootstrap(app: Express, express: any) {
   app.use("/post", postRouter);
   //comment
   app.use("/comment", commentRouter);
+  //chat
+  app.use("/chat", chatRouter);
   app.use("/{*dummy}", (req, res, next) => {
     return res.status(404).json({ message: "invalid router", success: false });
   });
