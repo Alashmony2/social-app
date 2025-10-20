@@ -9,7 +9,7 @@ class ChatService {
     const userLoggedIn = req.user._id;
     const chat = await this.chatRepository.getOne({
       user: { $all: [userId, userLoggedIn] },
-    });
+    },{},{populate:[{path:"messages"}]});
 
     return res.json({
       message: "done",
