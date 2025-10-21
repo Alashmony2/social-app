@@ -92,6 +92,37 @@ class CommentService {
       success: true,
     });
   };
+  public unFreezeComment = async (req: Request, res: Response) => {
+    //get data from request
+    const { id } = req.params;
+    //check comment exist
+    const commentExist = await this.commentRepository.exist(
+      { _id: id },
+      {},
+      { populate: [{ path: "postId", select: "userId" }] }
+    );
+    if (!commentExist) throw new NotFoundException("Comment not found");
+    //check authorization
+    if (
+      commentExist.userId.toString() != req.user._id.toString() &&
+      (commentExist.postId as unknown as IPost).userId.toString() !=
+        req.user._id.toString()
+    )
+      throw new NotAuthorizedException(
+        "You are not authorized to freeze this comment"
+      );
+    //check if post is already unfrozen
+    if (!commentExist.isFreezing)
+      throw new BadRequestException("Comment is not frozen");
+    //update DB
+    await this.commentRepository.update({ _id: id }, { isFreezing: false });
+    //send response
+    return res.status(200).json({
+      message: "Comment unfrozen successfully",
+      success: true,
+    });
+  };
+
   public deleteComment = async (req: Request, res: Response) => {
     //get data from request
     const { id } = req.params;

@@ -95,6 +95,27 @@ class PostService {
       success: true,
     });
   };
+  public unFreezePost = async (req: Request, res: Response) => {
+    //get data from request
+    const { id } = req.params;
+    //check post existence
+    const postExist = await this.postRepository.exist({ _id: id });
+    if (!postExist) throw new NotFoundException("Post not found");
+    //check authorization
+    if (postExist.userId.toString() != req.user._id.toString())
+      throw new NotAuthorizedException(
+        "You are not authorized to unfreeze this post"
+      );
+    //check if post is already unfrozen
+    if(!postExist.isFreezing) throw new BadRequestException("Post is not frozen");
+    //update DB
+    await this.postRepository.update({ _id: id }, { isFreezing: false });
+    //send response
+    return res.status(200).json({
+      message: "Post unfrozen successfully",
+      success: true,
+    });
+  };
 }
 
 export default new PostService();
