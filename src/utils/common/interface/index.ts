@@ -39,7 +39,7 @@ export interface IPost {
   content: string;
   reactions: IReaction[];
   attachments: IAttachment[];
-  isFreezing:boolean;
+  isFreezing: boolean;
 }
 
 export interface IComment {
@@ -51,6 +51,7 @@ export interface IComment {
   attachment: IAttachment;
   reactions: IReaction[];
   mentions?: ObjectId[];
+  isFreezing: boolean;
 }
 
 export interface IMessage {

@@ -20,6 +20,7 @@ export const commentSchema = new Schema<IComment>(
     },
     content: { type: String },
     reactions: [reactionSchema],
+    isFreezing: { type: Boolean, default: false }
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

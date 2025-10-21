@@ -87,7 +87,7 @@ class PostService {
       );
     //check if post is already frozen
     if(postExist.isFreezing) throw new BadRequestException("Post is already frozen");
-    //update from DB
+    //update DB
     await this.postRepository.update({ _id: id }, { isFreezing: true });
     //send response
     return res.status(200).json({
