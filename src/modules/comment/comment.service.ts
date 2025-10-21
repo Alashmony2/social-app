@@ -164,5 +164,26 @@ class CommentService {
     //send response
     return res.sendStatus(204);
   };
+
+  public update = async (req: Request, res: Response) => {
+    //get data from request
+    const { content } = req.body;
+    const { id } = req.params;
+    //check comment exist
+    const commentExist = await this.commentRepository.exist({ _id: id });
+    if (!commentExist) throw new NotFoundException("Comment not found");
+    //check authorization
+    if (commentExist.userId.toString() != req.user._id.toString())
+      throw new NotAuthorizedException(
+        "You are not authorized to update this comment"
+      );
+    //update DB
+    await this.commentRepository.update({ _id: id }, { content });
+    //send response
+    return res.status(200).json({
+      message: "Comment updated successfully",
+      success: true,
+    });
+  };
 }
 export default new CommentService();

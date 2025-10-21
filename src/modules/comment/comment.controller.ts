@@ -9,4 +9,5 @@ router.delete("/:id", isAuthenticated(), commentService.deleteComment);
 router.patch("/:id", isAuthenticated(), commentService.addReaction);
 router.patch("/freeze/:id", isAuthenticated(), commentService.freezeComment);
 router.patch("/unfreeze/:id", isAuthenticated(), commentService.unFreezeComment);
+router.patch("/update/:id", isAuthenticated(), commentService.update);
 export default router;

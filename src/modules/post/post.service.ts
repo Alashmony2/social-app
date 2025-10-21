@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "./../../DB";
-import { BadRequestException, NotAuthorizedException, NotFoundException } from "../../utils";
+import {
+  BadRequestException,
+  NotAuthorizedException,
+  NotFoundException,
+} from "../../utils";
 import { addReactionProvider } from "../../utils/common/providers/react.provider";
 
 class PostService {
@@ -29,7 +33,7 @@ class PostService {
     const { id } = req.params;
     const { reaction } = req.body;
     const userId = req.user._id;
-    addReactionProvider(this.postRepository,id,userId,reaction)
+    addReactionProvider(this.postRepository, id, userId, reaction);
     //send response
     return res.sendStatus(204);
   };
@@ -54,7 +58,7 @@ class PostService {
       .status(200)
       .json({ message: "done", success: true, data: { post } });
   };
-  
+
   public deletePost = async (req: Request, res: Response) => {
     //get data from request
     const { id } = req.params;
@@ -74,6 +78,7 @@ class PostService {
       success: true,
     });
   };
+
   public freezePost = async (req: Request, res: Response) => {
     //get data from request
     const { id } = req.params;
@@ -86,7 +91,8 @@ class PostService {
         "You are not authorized to freeze this post"
       );
     //check if post is already frozen
-    if(postExist.isFreezing) throw new BadRequestException("Post is already frozen");
+    if (postExist.isFreezing)
+      throw new BadRequestException("Post is already frozen");
     //update DB
     await this.postRepository.update({ _id: id }, { isFreezing: true });
     //send response
@@ -95,7 +101,8 @@ class PostService {
       success: true,
     });
   };
-  public unFreezePost = async (req: Request, res: Response) => {
+
+  public unfreezePost = async (req: Request, res: Response) => {
     //get data from request
     const { id } = req.params;
     //check post existence
@@ -107,12 +114,34 @@ class PostService {
         "You are not authorized to unfreeze this post"
       );
     //check if post is already unfrozen
-    if(!postExist.isFreezing) throw new BadRequestException("Post is not frozen");
+    if (!postExist.isFreezing)
+      throw new BadRequestException("Post is not frozen");
     //update DB
     await this.postRepository.update({ _id: id }, { isFreezing: false });
     //send response
     return res.status(200).json({
       message: "Post unfrozen successfully",
+      success: true,
+    });
+  };
+
+  public update = async (req: Request, res: Response) => {
+    //get data from request
+    const { content }: CreatePostDTO = req.body;
+    const { id } = req.params;
+    //check post existence
+    const postExist = await this.postRepository.exist({ _id: id });
+    if (!postExist) throw new NotFoundException("Post not found");
+    //check authorization
+    if (postExist.userId.toString() != req.user._id.toString())
+      throw new NotAuthorizedException(
+        "You are not authorized to update this post"
+      );
+    //update DB
+    await this.postRepository.update({ _id: id }, { content });
+    //send response
+    return res.status(200).json({
+      message: "Post updated successfully",
       success: true,
     });
   };
