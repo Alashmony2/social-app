@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { CreatePostDTO } from "./post.dto";
 import { PostFactoryService } from "./factory";
 import { PostRepository } from "./../../DB";
-import { NotAuthorizedException, NotFoundException } from "../../utils";
+import { BadRequestException, NotAuthorizedException, NotFoundException } from "../../utils";
 import { addReactionProvider } from "../../utils/common/providers/react.provider";
 
 class PostService {
@@ -71,6 +71,27 @@ class PostService {
     //send response
     return res.status(200).json({
       message: "Post deleted successfully",
+      success: true,
+    });
+  };
+  public freezePost = async (req: Request, res: Response) => {
+    //get data from request
+    const { id } = req.params;
+    //check post existence
+    const postExist = await this.postRepository.exist({ _id: id });
+    if (!postExist) throw new NotFoundException("Post not found");
+    //check authorization
+    if (postExist.userId.toString() != req.user._id.toString())
+      throw new NotAuthorizedException(
+        "You are not authorized to freeze this post"
+      );
+    //check if post is already frozen
+    if(postExist.isFreezing) throw new BadRequestException("Post is already frozen");
+    //update from DB
+    await this.postRepository.update({ _id: id }, { isFreezing: true });
+    //send response
+    return res.status(200).json({
+      message: "Post frozen successfully",
       success: true,
     });
   };
