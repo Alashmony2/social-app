@@ -1,7 +1,6 @@
 import { Schema } from "mongoose";
 import { IUser, sendMail } from "../../../utils";
 import { GENDER, SYS_ROLE, USER_AGENT } from "../../../utils";
-import { ref } from "process";
 
 export const userSchema = new Schema<IUser>(
   {
@@ -50,6 +49,8 @@ export const userSchema = new Schema<IUser>(
     otpExpiryAt: { type: Date },
     isVerified: { type: Boolean, default: false },
     friends: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    friendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    sentRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

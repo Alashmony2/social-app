@@ -52,7 +52,6 @@ class PostService {
         ],
       }
     );
-    console.log(post.populate);
     if (!post) throw new NotFoundException("Post not found");
     return res
       .status(200)

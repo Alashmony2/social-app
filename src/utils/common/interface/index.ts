@@ -22,6 +22,8 @@ export interface IUser {
   otpExpiryAt: Date;
   isVerified?: boolean;
   friends: ObjectId[];
+  friendRequests: ObjectId[];
+  sentRequests: ObjectId[];
 }
 
 export interface IUser {
