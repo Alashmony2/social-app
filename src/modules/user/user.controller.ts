@@ -19,4 +19,9 @@ router.post(
   isAuthenticated(),
   userService.deleteFriendRequest
 );
+router.post(
+  "/unfriend/:id",
+  isAuthenticated(),
+  userService.unfriend
+);
 export default router;

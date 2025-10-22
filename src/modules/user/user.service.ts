@@ -114,6 +114,37 @@ class UserService {
       success: true,
     });
   };
+
+  public unfriend = async (req: Request, res: Response) => {
+    //get data from request
+    const { id: friendId } = req.params;
+    const userId = req.user._id;
+
+    const user = await this.userRepository.exist({ _id: userId });
+    const friend = await this.userRepository.exist({ _id: friendId });
+
+    if (!user || !friend) throw new NotFoundException("User not found");
+
+    // is already friends 
+    if (!user.friends.includes(friendId as unknown as ObjectId))
+      throw new BadRequestException("You are not friends with this user");
+
+    // delete from each other
+    await this.userRepository.update(
+      { _id: userId },
+      { $pull: { friends: friendId } }
+    );
+
+    await this.userRepository.update(
+      { _id: friendId },
+      { $pull: { friends: userId } }
+    );
+
+    return res.status(200).json({
+      message: "Unfriended successfully",
+      success: true,
+    });
+  };
 }
 
 export default new UserService();
