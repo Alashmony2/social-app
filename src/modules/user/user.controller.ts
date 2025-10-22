@@ -3,6 +3,20 @@ import userService from "./user.service";
 import { isAuthenticated } from "../../middleware/auth.middleware";
 
 const router = Router();
-router.get("/profile",isAuthenticated(),userService.getProfile)
-router.post("/sendFriendRequest/:id",isAuthenticated(),userService.sendFriendRequest)
+router.get("/profile", isAuthenticated(), userService.getProfile);
+router.post(
+  "/sendFriendRequest/:id",
+  isAuthenticated(),
+  userService.sendFriendRequest
+);
+router.post(
+  "/acceptFriendRequest/:id",
+  isAuthenticated(),
+  userService.acceptFriendRequest
+);
+router.post(
+  "/deleteFriendRequest/:id",
+  isAuthenticated(),
+  userService.deleteFriendRequest
+);
 export default router;

@@ -48,6 +48,72 @@ class UserService {
       success: true,
     });
   };
+
+  public acceptFriendRequest = async (req: Request, res: Response) => {
+    //get data from request
+    const { id: senderId } = req.params;
+    const receiverId = req.user._id;
+
+    const sender = await this.userRepository.exist({ _id: senderId });
+    const receiver = await this.userRepository.exist({ _id: receiverId });
+    if (!sender || !receiver) throw new NotFoundException("User not found");
+    // already friends
+    if (sender.friends.includes(receiverId as unknown as ObjectId))
+      throw new BadRequestException("Already friends");
+    // check if request exists
+    if (!receiver.friendRequests.includes(senderId as unknown as ObjectId))
+      throw new BadRequestException("No friend request from this user");
+
+    // update both sides
+    await this.userRepository.update(
+      { _id: receiverId },
+      {
+        $pull: { friendRequests: senderId },
+        $push: { friends: senderId },
+      }
+    );
+
+    await this.userRepository.update(
+      { _id: senderId },
+      {
+        $pull: { sentRequests: receiverId },
+        $push: { friends: receiverId },
+      }
+    );
+    return res.status(200).json({
+      message: "Friend request accepted successfully",
+      success: true,
+    });
+  };
+
+  public deleteFriendRequest = async (req: Request, res: Response) => {
+    const { id: senderId } = req.params;
+    const receiverId = req.user._id;
+
+    const sender = await this.userRepository.exist({ _id: senderId });
+    const receiver = await this.userRepository.exist({ _id: receiverId });
+
+    if (!sender || !receiver) throw new NotFoundException("User not found");
+
+    if (!receiver.friendRequests.includes(senderId as unknown as ObjectId))
+      throw new BadRequestException("No friend request from this user");
+
+    // remove request from both sides
+    await this.userRepository.update(
+      { _id: receiverId },
+      { $pull: { friendRequests: senderId } }
+    );
+
+    await this.userRepository.update(
+      { _id: senderId },
+      { $pull: { sentRequests: receiverId } }
+    );
+
+    return res.status(200).json({
+      message: "Friend request declined successfully",
+      success: true,
+    });
+  };
 }
 
 export default new UserService();
