@@ -24,6 +24,7 @@ export interface IUser {
   friends: ObjectId[];
   friendRequests: ObjectId[];
   sentRequests: ObjectId[];
+  blockedUsers: ObjectId[];
 }
 
 export interface IUser {

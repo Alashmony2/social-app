@@ -24,4 +24,9 @@ router.post(
   isAuthenticated(),
   userService.unfriend
 );
+router.post(
+  "/block/:id",
+  isAuthenticated(),
+  userService.blockUser
+);
 export default router;

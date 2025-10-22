@@ -125,7 +125,7 @@ class UserService {
 
     if (!user || !friend) throw new NotFoundException("User not found");
 
-    // is already friends 
+    // is already friends
     if (!user.friends.includes(friendId as unknown as ObjectId))
       throw new BadRequestException("You are not friends with this user");
 
@@ -142,6 +142,52 @@ class UserService {
 
     return res.status(200).json({
       message: "Unfriended successfully",
+      success: true,
+    });
+  };
+
+  public blockUser = async (req: Request, res: Response) => {
+    const { id: blockedUserId } = req.params;
+    const userId = req.user._id;
+
+    const user = await this.userRepository.exist({ _id: userId });
+    const blockedUser = await this.userRepository.exist({ _id: blockedUserId });
+
+    if (!user || !blockedUser) throw new NotFoundException("User not found");
+
+    if (user.blockedUsers.includes(blockedUser._id))
+      throw new BadRequestException("User already blocked");
+
+    await this.userRepository.update(
+      { _id: userId },
+      {
+        $pull: {
+          friends: blockedUserId,
+          friendRequests: blockedUserId,
+          sentRequests: blockedUserId,
+        },
+      }
+    );
+
+    await this.userRepository.update(
+      { _id: blockedUserId },
+      {
+        $pull: {
+          friends: userId,
+          friendRequests: userId,
+          sentRequests: userId,
+        },
+      }
+    );
+
+    await this.userRepository.update(
+      { _id: userId },
+      { $push: { blockedUsers: blockedUserId } }
+    );
+
+
+    return res.status(200).json({
+      message: "User blocked successfully",
       success: true,
     });
   };
