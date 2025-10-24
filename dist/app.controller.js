@@ -7,6 +7,8 @@ exports.bootstrap = bootstrap;
 const modules_1 = require("./modules");
 const DB_1 = require("./DB");
 const cors_1 = __importDefault(require("cors"));
+const express_1 = require("graphql-http/lib/use/express");
+const app_schema_1 = require("./app.schema");
 function bootstrap(app, express) {
     (0, DB_1.connectDB)();
     //parsing body => row json
@@ -22,6 +24,8 @@ function bootstrap(app, express) {
     app.use("/comment", modules_1.commentRouter);
     //chat
     app.use("/chat", modules_1.chatRouter);
+    //graphql
+    app.all("/graphql", (0, express_1.createHandler)({ schema: app_schema_1.appSchema }));
     app.use("/{*dummy}", (req, res, next) => {
         return res.status(404).json({ message: "invalid router", success: false });
     });

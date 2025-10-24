@@ -4,6 +4,8 @@ import { connectDB } from "./DB";
 import { Request, NextFunction, Response } from "express";
 import { AppError } from "./utils";
 import cors from "cors"
+import { createHandler } from "graphql-http/lib/use/express";
+import { appSchema } from "./app.schema";
 export function bootstrap(app: Express, express: any) {
   connectDB();
   //parsing body => row json
@@ -19,6 +21,8 @@ export function bootstrap(app: Express, express: any) {
   app.use("/comment", commentRouter);
   //chat
   app.use("/chat", chatRouter);
+  //graphql
+  app.all("/graphql",createHandler({schema:appSchema}))
   app.use("/{*dummy}", (req, res, next) => {
     return res.status(404).json({ message: "invalid router", success: false });
   });
