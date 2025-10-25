@@ -25,7 +25,17 @@ function bootstrap(app, express) {
     //chat
     app.use("/chat", modules_1.chatRouter);
     //graphql
-    app.all("/graphql", (0, express_1.createHandler)({ schema: app_schema_1.appSchema }));
+    app.all("/graphql", (0, express_1.createHandler)({
+        schema: app_schema_1.appSchema,
+        formatError: (error) => {
+            return {
+                message: error.message,
+                success: false,
+                path: error.path,
+                errorDetails: error.originalError,
+            };
+        },
+    }));
     app.use("/{*dummy}", (req, res, next) => {
         return res.status(404).json({ message: "invalid router", success: false });
     });

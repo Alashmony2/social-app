@@ -1,16 +1,25 @@
 import { type Express } from "express";
-import { authRouter, postRouter, userRouter, commentRouter, chatRouter } from "./modules";
+import {
+  authRouter,
+  postRouter,
+  userRouter,
+  commentRouter,
+  chatRouter,
+} from "./modules";
 import { connectDB } from "./DB";
 import { Request, NextFunction, Response } from "express";
 import { AppError } from "./utils";
-import cors from "cors"
+import cors from "cors";
 import { createHandler } from "graphql-http/lib/use/express";
 import { appSchema } from "./app.schema";
+import { GraphQLError } from "graphql";
+import { success } from "zod";
+import path from "path";
 export function bootstrap(app: Express, express: any) {
   connectDB();
   //parsing body => row json
   app.use(express.json());
-  app.use(cors({origin:"*"}))
+  app.use(cors({ origin: "*" }));
   //auth
   app.use("/auth", authRouter);
   //user
@@ -22,7 +31,20 @@ export function bootstrap(app: Express, express: any) {
   //chat
   app.use("/chat", chatRouter);
   //graphql
-  app.all("/graphql",createHandler({schema:appSchema}))
+  app.all(
+    "/graphql",
+    createHandler({
+      schema: appSchema,
+      formatError: (error: GraphQLError) => {
+        return {
+          message: error.message,
+          success: false,
+          path: error.path,
+          errorDetails: error.originalError,
+        } as unknown as GraphQLError;
+      },
+    })
+  );
   app.use("/{*dummy}", (req, res, next) => {
     return res.status(404).json({ message: "invalid router", success: false });
   });
