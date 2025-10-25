@@ -43,6 +43,12 @@ export function bootstrap(app: Express, express: any) {
           errorDetails: error.originalError,
         } as unknown as GraphQLError;
       },
+      context: (req) => {
+        const token = req.headers["authorization"];
+        return {
+          token
+        };
+      },
     })
   );
   app.use("/{*dummy}", (req, res, next) => {

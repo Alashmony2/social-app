@@ -35,6 +35,12 @@ function bootstrap(app, express) {
                 errorDetails: error.originalError,
             };
         },
+        context: (req) => {
+            const token = req.headers["authorization"];
+            return {
+                token
+            };
+        },
     }));
     app.use("/{*dummy}", (req, res, next) => {
         return res.status(404).json({ message: "invalid router", success: false });
