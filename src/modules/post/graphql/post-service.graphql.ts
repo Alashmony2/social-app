@@ -8,5 +8,23 @@ export const getSpecificPost = async(parent, args) => {
         { populate: [{ path: "userId" }] }
       );
       if (!post) throw new Error("post not found");
-      return post;
+      return {
+        message:"done",
+        success:true,
+        data:post
+      };
+    }
+
+    export const getPosts = async(parent, args) => {
+      const postRepo = new PostRepository();
+      const posts = await postRepo.getAll(
+        {},
+        {},
+        { populate: [{ path: "userId" }] }
+      );
+      return {
+        message:"done",
+        success:true,
+        data:posts
+      };
     }
